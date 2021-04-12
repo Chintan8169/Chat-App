@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+html(lang="en")
+	head
+		meta(charset="UTF-8")
+		meta(name="viewport", content="width=device-width, initial-scale=1.0")
+		link(rel="stylesheet", href="css/hamburger.css")
+		link(rel="stylesheet", href="css/login.css")
+		link(rel="shortcut icon", href="./favicon.ico", type="image/x-icon")
+		link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.5.0/css/all.min.css" ,integrity="sha512-QfDd74mlg8afgSqm3Vq2Q65e9b3xMhJB4GZ9OcHDVy1hZ6pqBJPWWnMsKDXM7NINoKqJANNGBuVRIpIJ5dogfA==", crossorigin="anonymous" )
+		title Login to Chat App
+	body
+		include ../partials/hamburgur.pug
+		.container
+			h1 Login to see all your chat
+			form(action="/login", method="post")
+				.inputbox
+					label.loginLabel(for="username") Enter your username : 
+						span.required *
+					input.formControl#username(type="text", name="username" ,placeholder="Username","required")
+				.inputbox
+					label.loginLabel(for="password") Enter your password : 
+						span.required *
+					input.formControl#password(type="password", name="password",placeholder="Password" ,"required")
+					#err
+				.inputbox
+					input#submit(type="submit", value="Login")
+	script.
+		const username=document.getElementById('username');
+		const password=document.getElementById('password');
+		let error=document.getElementById('err');
+		error.style.display='#{display}';
+		error.innerText=`#{msg}`;

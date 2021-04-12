@@ -1,0 +1,70 @@
+.container {
+	margin: 10px 20px;
+}
+
+.inputbox {
+	margin: 20px 0;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.loginLabel {
+	font-size: 20px;
+	margin-bottom: 7px;
+}
+
+.formControl {
+	font-size: 18px;
+	padding: 5px;
+	color: black;
+	border-radius: 8px;
+	border: 1px solid #fff;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.9);
+}
+
+.required {
+	color: red;
+}
+
+.formControl::placeholder {
+	font-size: 15px;
+}
+
+.formControl:focus {
+	box-shadow: 0 0 0px #34B7F1,
+	0 0 1px #34B7F1,
+	0 0 2px #34B7F1,
+	0 0 3px #34B7F1,
+	0 0 4px #34B7F1,
+	0 0 5px #34B7F1,
+	0 0 6px #34B7F1,
+	0 0 7px #34B7F1;
+	transition: all 0.25s;
+}
+
+#add {
+	text-align: center;
+	width: 150px;
+	cursor: pointer;
+	font-size: 20px;
+	color: black;
+	font-weight: bold;
+	background: #25D366;
+	padding: 5px 20px;
+	border: 2px solid #25D366;
+	border-radius: 10px;
+}
+
+#add:hover,#add:focus {
+	box-shadow: 0 0 5px #25D366,
+	0 0 10px #25D366,
+	0 0 13px #25D366;
+	transition:all 0.5s ease;
+}
+
+#err {
+	display: none;
+	color: red;
+	margin-top: 5px;
+}

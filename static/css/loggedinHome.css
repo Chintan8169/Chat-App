@@ -1,0 +1,30 @@
+.container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.contacts {
+	position: relative;
+	width: 100%;
+	padding: 10px 30px;
+	font-size: 25px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+	border-top: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.contacts a,.err a {
+	text-decoration: none;
+	color: #4DD0E1;
+}
+
+.contacts a:hover,.err a:hover {
+	text-decoration: underline;
+}
+
+.err {
+	padding: 10px 30px;
+	color: #fff;
+	font-size: 28px;
+}

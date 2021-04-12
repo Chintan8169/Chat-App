@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+html(lang="en")
+	head
+		meta(charset="UTF-8")
+		meta(name="viewport", content="width=device-width, initial-scale=1.0")
+		link(rel="stylesheet", href="css/hamburger.css")
+		link(rel="stylesheet", href="css/index.css")
+		link(rel="shortcut icon", href="./favicon.ico", type="image/x-icon")
+		link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.5.0/css/all.min.css" ,integrity="sha512-QfDd74mlg8afgSqm3Vq2Q65e9b3xMhJB4GZ9OcHDVy1hZ6pqBJPWWnMsKDXM7NINoKqJANNGBuVRIpIJ5dogfA==", crossorigin="anonymous" )
+		title Chat App
+	body
+		include ../partials/hamburgur.pug
+		.container
+			h1.welcomeh1 Welcome to Chat App
+			p.welcome Here you can create your account.
+			p.welcome You can chat to our existing users
+			p.welcome Also, you can also chat in group.
+			p.welcome Your all the chat are stored in our database and you can access to it anytime.
+			p.welcome Your messages will never be deleted unless you manually delete them.
+			h3 For logging into your account  
+				a(href="/login")  Click Here
+			h3 For creating new account  
+				a(href="/signup")  Click Here

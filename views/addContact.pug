@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+html(lang="en")
+	head
+		meta(charset="UTF-8")
+		meta(name="viewport", content="width=device-width, initial-scale=1.0")
+		title Chat App #{name}
+		link(rel="stylesheet", href="css/hamburger.css")
+		link(rel="stylesheet", href="css/addContact.css")
+		link(rel="shortcut icon", href="./favicon.ico", type="image/x-icon")
+		link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.5.0/css/all.min.css" ,integrity="sha512-QfDd74mlg8afgSqm3Vq2Q65e9b3xMhJB4GZ9OcHDVy1hZ6pqBJPWWnMsKDXM7NINoKqJANNGBuVRIpIJ5dogfA==", crossorigin="anonymous" )
+		body
+			include ../partials/loggedinHamburger.pug
+			.container
+				h1 Add Contact
+				form(action="/addContact", method="post")
+					.inputbox
+						label.loginLabel(for="username") Enter username of that user : 
+							span.required *
+						input.formControl#username(type="text", name="username" ,	placeholder="Username","required")
+						#err
+					.inputbox
+						input#add(type="submit", value="Add")
+		script.
+			const username=document.getElementById('username');
+			let error=document.getElementById('err');
+			error.style.display='#{display}';
+			error.innerText=`#{msg}`;

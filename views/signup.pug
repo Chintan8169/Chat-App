@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+html(lang="en")
+	head
+		meta(charset="UTF-8")
+		meta(name="viewport", content="width=device-width, initial-scale=1.0")
+		link(rel="stylesheet", href="css/hamburger.css")
+		link(rel="stylesheet", href="css/signup.css")
+		link(rel="shortcut icon", href="./favicon.ico", type="image/x-icon")
+		link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.5.0/css/all.min.css" ,integrity="sha512-QfDd74mlg8afgSqm3Vq2Q65e9b3xMhJB4GZ9OcHDVy1hZ6pqBJPWWnMsKDXM7NINoKqJANNGBuVRIpIJ5dogfA==", crossorigin="anonymous")
+		title Sign Up for Chat App
+	body
+		include ../partials/hamburgur.pug
+		.container
+			h1 Sign Up to our chat app
+			form(action="/signup", method="post")
+				.inputbox
+					label.loginLabel(for="name") Enter your name : 
+						span.required *
+					input.formControl#name(type="text", name="name" ,placeholder="Name","required")
+					.err
+				.inputbox
+					label.loginLabel(for="username") Create your username : 
+						span.required *
+					input.formControl#username(type="text", name="username" ,placeholder="Username","required")
+					.err
+				.inputbox
+					label.loginLabel(for="password") Create your password : 
+						span.required *
+					input.formControl#password(type="password", name="password",placeholder="Password" ,"required")
+					.err
+				.inputbox
+					label.loginLabel(for="cpassword") Enter your password again : 
+						span.required *
+					input.formControl#cpassword(type="password", name="cpassword", placeholder="Confirm Password","required")
+					.err
+				.inputbox
+					input#submit.submit(type="submit", value="Sign Up")
+script(src="js/signupvalidate.js")
+script.
+	error[#{no}].style.display='#{display}';
+	error[#{no}].innerText=`#{msg}`;
