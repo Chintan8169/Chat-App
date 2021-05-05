@@ -3,22 +3,28 @@ body {
 	flex-direction: column;
 }
 
-@media (min-width:650px) {
+@media (min-width:768px) {
 	body {
 		height: 100vh;
 	}
+
+	.container {
+		margin: 10px 150px;
+	}
 }
 
-@media (min-width:0) and (max-width:649px) {
+@media (min-width:0) and (max-width:768px) {
 	body {
 		height: 93vh;
+	}
+	.container {
+		padding: 5px 15px;
 	}
 }
 
 .container {
 	position: relative;
 	overflow-y: auto;
-	margin: 5px 15px;
 	display: flex;
 	flex-direction: column;
 }
@@ -46,7 +52,7 @@ body {
 	width: 95%;
 	min-height: 100%;
 	max-height: 100%;
-	font-size: 25px;
+	font-size: 22px;
 	padding: 8px 17px;
 	border-radius: 50px;
 	color: black;
@@ -60,7 +66,6 @@ body {
 	margin-top: auto;
 }
 
-
 .messageContainer.left::before {
 	content: '';
 	position: absolute;
@@ -71,6 +76,7 @@ body {
 	width: 20px;
 	transform: skewX(45deg) translateX(15px);
 	z-index: -1;
+	border-radius: 10px;
 }
 
 .messageContainer.right::before {
@@ -83,6 +89,7 @@ body {
 	width: 20px;
 	transform: skewX(-45deg) translateX(-15px);
 	z-index: -1;
+	border-radius: 10px;
 }
 
 .messageContainer {
@@ -93,23 +100,23 @@ body {
 }
 
 .from {
-	font-weight: bold;
-	margin: 10px 0 5px 10px;
-	font-size: 25px;
+	font-weight: 400;
+	margin: 1px 10px;
+	font-size: 22px;
 }
 
 .msg {
 	text-align: justify;
 	word-wrap: break-word;
 	white-space: pre-line;
-	margin: 5px 20px;
-	font-size: 20px;
+	margin: 0 20px;
+	font-size: 18px;
 }
 
 .time {
 	display: block;
-	color: #c9d7e8a1;
-	margin: 5px 10px;
+	color: #c9d7e8bd;
+	margin: 0 10px;
 	text-align: right;
 }
 

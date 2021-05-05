@@ -6,13 +6,18 @@ html(lang="en")
 		title Chat App #{name}
 		link(rel="stylesheet", href="css/hamburger.css")
 		link(rel="stylesheet", href="css/mainChat.css")
+		link(rel="stylesheet", href="css/loading.css")
 		link(rel="shortcut icon", href="./favicon.ico", type="image/x-icon")
 		link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.5.0/css/all.min.css" ,integrity="sha512-QfDd74mlg8afgSqm3Vq2Q65e9b3xMhJB4GZ9OcHDVy1hZ6pqBJPWWnMsKDXM7NINoKqJANNGBuVRIpIJ5dogfA==", crossorigin="anonymous" )
 	body
 		include ../partials/loggedinHamburger.pug
+		.animation
+			.semi-circle Loading...
+			.ball
+			.ball2
 		.container
 		form.sendForm(autocomplete="off")
-			textarea#ipMsg(type="text", name="msg", placeholder="Enter Your Message here" required autofocus)
+			textarea#ipMsg(name="msg", placeholder="Enter Your Message here" required autofocus)
 			i.sendLogo.fas.fa-paper-plane
 	script(src="socket.io/socket.io.js")
 	script(src="js/mainChat.js")

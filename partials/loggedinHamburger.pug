@@ -1,13 +1,22 @@
-.nav 
-	.logoDiv
-		h2.logo Chat App
-		.hamburger
-	ul.navul
-		li.navli
-			a(href="/loggedinHome") All Contacts
-		li.navli 
-			a(href="/addContact") Add new Contact
-		li.navli 
-			a(href="/logout") Logout
-	
-script(src="js/hamburgur.js")
+.navbar
+	input#showLinks(type="checkbox", name="showLinks")
+	.logodiv
+		a.logo(href="/") Chat App
+		label.hamburger(for="showLinks")
+	.links
+		.innerLink
+			.link
+				a(href="/loggedinHome") Home
+			.dropdownToggle
+				.toggle Services
+				.dropdown
+					a(href="/loggedinHome") All Contacts
+					a(href="/addContact") Add New Contact
+			.dropdownToggleMobile
+				input#hideShow(type="checkbox", name="hideShow")
+				label.toggleMobile(for="hideShow") Services
+				.dropdownMobile
+					a(href="/loggedinHome") All Contacts
+					a(href="/addContact") Add New Contact
+			.link
+				a(href="/logout") Logout

@@ -1,7 +1,3 @@
-.container {
-	margin: 10px 20px;
-}
-
 .welcomeh1 {
 	margin: 20px 0 40px 0;
 }
@@ -24,4 +20,16 @@
 
 .container h3 a:hover {
 	text-decoration: underline;
+}
+
+@media (min-width: 0px) and (max-width: 768px) {
+	.container {
+		padding: 10px 20px;
+	}
+}
+
+@media (min-width: 768px) {
+	.container {
+		padding: 10px 150px;
+	}
 }

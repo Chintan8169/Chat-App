@@ -8,10 +8,9 @@
 .contacts {
 	position: relative;
 	width: 100%;
-	padding: 10px 30px;
+	padding: 10px;
 	font-size: 25px;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-	border-top: 1px solid rgba(255, 255, 255, 0.4);
+	border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .contacts a,.err a {
@@ -27,4 +26,17 @@
 	padding: 10px 30px;
 	color: #fff;
 	font-size: 28px;
+}
+
+
+@media (min-width: 0px) and (max-width: 768px) {
+	.container {
+		padding: 10px 20px;
+	}
+}
+
+@media (min-width: 768px) {
+	.container {
+		padding: 10px 150px;
+	}
 }

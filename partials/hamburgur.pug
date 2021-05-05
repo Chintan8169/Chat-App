@@ -1,13 +1,13 @@
-.nav 
-	.logoDiv 
-		h2.logo Chat App
-		.hamburger
-
-	ul.navul
-		li.navli
-			a(href="/") Home
-		li.navli 
-			a(href="/login") Login
-		li.navli 
-			a(href="/signup") Sign Up
-script(src="js/hamburgur.js")
+.navbar
+	input#showLinks(type="checkbox", name="showLinks")
+	.logodiv 
+		a.logo(href="/") Chat App
+		label.hamburger(for="showLinks")
+	.links
+		.innerLink
+			.link
+				a(href="/") Home
+			.link
+				a(href="/login") Login
+			.link
+				a(href="/signup") Sign UP

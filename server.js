@@ -24,11 +24,41 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 const viewsPath = path.join(__dirname, "views");
 app.set("view engine", "pug");
-app.set("views",viewsPath);
+app.set("views", viewsPath);
 
 const activeUsers = [];
 const socketInfo = {};
 const roomNames = [];
+
+// Database connections
+const chatsConnection = mongoose.createConnection(`mongodb+srv://Chintan8169:Chintan@9712@chintan8169.xbadk.mongodb.net/Chats?retryWrites=true&w=majority`, {
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+	useCreateIndex: true,
+	useFindAndModify: false
+});
+
+const msgSchema = new mongoose.Schema({
+	from: String,
+	msg: String,
+	date: String
+});
+
+const contactsConnection = mongoose.createConnection(`mongodb+srv://Chintan8169:Chintan@9712@chintan8169.xbadk.mongodb.net/Contacts?retryWrites=true&w=majority`, {
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+	useCreateIndex: true,
+	useFindAndModify: false
+});
+
+const contactsSchema = new mongoose.Schema({
+	username: {
+		type: String,
+		unique: true
+	},
+	name: String
+});
+// const Contacts = contactsConnection.model("Contacts", contactsSchema);
 
 
 // Home page
@@ -155,18 +185,22 @@ app.get("/loggedinHome", (req, res) => {
 // fetch contacts event handle
 app.get("/fetchContacts", async (req, res) => {
 	try {
-		const username = req.cookies.username;
 		const token = req.cookies.jwt;
 		const result = jwt.verify(token, "chintanrajsinh@Harendrasinh@Gohil");
-		const contactsColl = createContact(username.toLowerCase());
-		const contacts = await contactsColl.find();
-		res.send(contacts);
+		const username = req.cookies.username;
+		const Contacts = contactsConnection.model(username.toLowerCase(), contactsSchema);
+		const contactsArr = await Contacts.find();
+		const contacts = [];
+		contactsArr.forEach(contact => {
+			contacts.push({ name: contact.name });
+		});
+		res.status(200).send(contacts);
 	}
 	catch (err) {
 		console.log(err);
 		res.redirect("/login");
 	}
-})
+});
 
 
 
@@ -221,47 +255,10 @@ const handleRoom = str => {
 	}
 }
 
-// save message function
-const msgSaveFun = async (from, to, mesg, date) => {
-	try {
-		const conn = mongoose.createConnection(`mongodb+srv://Chintan8169:Chintan@9712@chintan8169.xbadk.mongodb.net/Chats?retryWrites=true&w=majority`, {
-			useNewUrlParser: true,
-			useUnifiedTopology: true,
-			useCreateIndex: true,
-			useFindAndModify: false
-		});
-		conn.once("open", async () => {
-			const msgSchema = new mongoose.Schema({
-				from: String,
-				msg: String,
-				date: String
-			});
-			conn.db.listCollections().toArray(async (err, names) => {
-				let userData = await Users.findOne({ name: from });
-				let clientData = await Users.findOne({ name: to });
-				if (err) {
-					console.log(err);
-				}
-				else {
-					let collectionName = `${userData.username.toLowerCase()}-${clientData.username.toLowerCase()}`;
-					for (let i = 0; i < names.length; i++) {
-						if (names[i].name == `${clientData.username.toLowerCase()}-${userData.username.toLowerCase()}`) {
-							collectionName = `${clientData.username.toLowerCase()}-${userData.username.toLowerCase()}`;
-							break;
-						}
-					}
-					let Msg = conn.model(collectionName, msgSchema);
-					let data = { from, msg: mesg, date }
-					let newMsg = new Msg(data);
-					let result = await newMsg.save();
-					return result;
-				}
-			});
-		});
-	}
-	catch (err) {
-		console.log(err);
-	}
+const setCollectionName = name => {
+	collectionNameArr = name.trim().split("-");
+	let collectionNameSorted = collectionNameArr[0].localeCompare(collectionNameArr[1]) < 0 ? name : collectionNameArr[1] + "-" + collectionNameArr[0];
+	return collectionNameSorted;
 }
 
 // socket.io conncection & main chat screen handle
@@ -299,7 +296,13 @@ io.on("connection", socket => {
 			roomname = `${data.to}-${data.from}`;
 		}
 		try {
-			const result = await msgSaveFun(data.from, data.to, data.msg, data.date);
+			let fromusername = await Users.findOne({ name: data.from });
+			let tousername = await Users.findOne({ name: data.to });
+			console.log(fromusername,tousername);
+			let Msg = chatsConnection.model(setCollectionName(fromusername.username + "-" + tousername.username), msgSchema);
+			let msgdata = { from: data.from, msg: data.msg, date: data.date };
+			let newMsg = new Msg(msgdata);
+			let result = await newMsg.save();
 			io.to(roomname).emit("newmsg", { msg: data.msg, from: data.from, date: data.date });
 		}
 		catch (err) {
@@ -351,7 +354,7 @@ app.post("/addContact", async (req, res) => {
 			res.render("addContact.pug", { display: "block", msg: "This user does not exist in our database" });
 		}
 		else {
-			const Contacts = createContact(username.toLowerCase());
+			const Contacts = contactsConnection.model(username.toLowerCase(), contactsSchema);
 			const alreadyExist = await Contacts.findOne({ username: contactName });
 			if (alreadyExist === null) {
 				const newContact = new Contacts({ username: contactName, name: userB.name });
@@ -377,79 +380,28 @@ app.post("/addContact", async (req, res) => {
 // fetch message from database
 app.get("/fetchMsg", async (req, res) => {
 	try {
-		let userData = await Users.findOne({ name: req.query.from });
-		let clientData = await Users.findOne({ name: req.query.to });
 		const token = req.cookies.jwt;
 		const r = jwt.verify(token, "chintanrajsinh@Harendrasinh@Gohil");
-		const conn = mongoose.createConnection(`mongodb+srv://Chintan8169:Chintan@9712@chintan8169.xbadk.mongodb.net/Chats?retryWrites=true&w=majority`, {
-			useNewUrlParser: true,
-			useUnifiedTopology: true,
-			useCreateIndex: true,
-			useFindAndModify: false
+		let fromusername = req.cookies.username;
+		let tousername = await Users.findOne({ name: req.query.to });
+		let Msg = chatsConnection.model(setCollectionName(fromusername + "-" + tousername.username), msgSchema);
+		let result = await Msg.find();
+		let messages = [];
+		result.forEach(e => {
+			let data = {
+				from: e.from,
+				msg: e.msg,
+				date: e.date
+			}
+			messages.push(data);
 		});
-		const msgSchema = new mongoose.Schema({
-			from: String,
-			msg: String,
-			date: String
-		});
-		conn.once("open", async () => {
-			conn.db.listCollections().toArray(async (err, names) => {
-				if (err) {
-					console.log(err);
-				}
-				else {
-					let collectionName = `${userData.username.toLowerCase()}-${clientData.username.toLowerCase()}`;
-					for (let i = 0; i < names.length; i++) {
-						if (names[i].name == `${clientData.username.toLowerCase()}-${userData.username.toLowerCase()}`) {
-							collectionName = `${clientData.username.toLowerCase()}-${userData.username.toLowerCase()}`;
-							break;
-						}
-					}
-					let Msg = conn.model(collectionName, msgSchema);
-					let result = await Msg.find();
-					let messages = [];
-					result.forEach(e => {
-						let data = {
-							from: e.from,
-							msg: e.msg,
-							date: e.date
-						}
-						messages.push(data);
-					});
-					res.status(200).type("json").send(JSON.stringify(messages));
-				}
-			});
-		});
+		res.status(200).type("json").send(JSON.stringify(messages));
 	}
 	catch (err) {
 		res.redirect("/login");
 		console.log(err);
 	}
 });
-
-
-const createContact = (username) => {
-	try {
-		const conn2 = mongoose.createConnection(`mongodb+srv://Chintan8169:Chintan@9712@chintan8169.xbadk.mongodb.net/${username}?retryWrites=true&w=majority`, {
-			useNewUrlParser: true,
-			useUnifiedTopology: true,
-			useCreateIndex: true,
-			useFindAndModify: false
-		});
-		const contactsSchema = new mongoose.Schema({
-			username: {
-				type: String,
-				unique: true
-			},
-			name: String
-		});
-		const Contacts = conn2.model("Contact", contactsSchema);
-		return Contacts;
-	}
-	catch (err) {
-		console.log(err);
-	}
-}
 
 
 app.get("/logout", async (req, res) => {
