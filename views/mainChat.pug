@@ -8,7 +8,7 @@ html(lang="en")
 		link(rel="stylesheet", href="css/mainChat.css")
 		link(rel="stylesheet", href="css/loading.css")
 		link(rel="shortcut icon", href="./favicon.ico", type="image/x-icon")
-		link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.5.0/css/all.min.css" ,integrity="sha512-QfDd74mlg8afgSqm3Vq2Q65e9b3xMhJB4GZ9OcHDVy1hZ6pqBJPWWnMsKDXM7NINoKqJANNGBuVRIpIJ5dogfA==", crossorigin="anonymous" )
+		link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" ,integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==", crossorigin="anonymous" )
 	body
 		include ../partials/loggedinHamburger.pug
 		.animation
@@ -16,8 +16,21 @@ html(lang="en")
 			.ball
 			.ball2
 		.container
-		form.sendForm(autocomplete="off")
-			textarea#ipMsg(name="msg", placeholder="Enter Your Message here" required autofocus)
+		form.sendForm(autocomplete="off" enctype="multipart/form-data")
+			i.paperclip.fas.fa-paperclip
+			.modal.close
+				.innerModal.close
+					.animate
+					i.cross.fas.fa-times
+					input#file(type="file", name="file")
+					label#filesLabel(for="file")
+						i.upload.fas.fa-upload
+						|Choose File...
+					i.far.fa-paper-plane#send
+							span Send
+					.err
+			textarea#ipMsg(name="msg", placeholder="Enter Your Message here" autofocus)
 			i.sendLogo.fas.fa-paper-plane
 	script(src="socket.io/socket.io.js")
+	script(src="js/validator.js")
 	script(src="js/mainChat.js")

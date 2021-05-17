@@ -2,12 +2,15 @@ const mongoose = require("mongoose");
 const http = require("http");
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
 const chatapp = require("./db/allUsers");
 const Users = require("./models/newUser");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const socketio = require("socket.io");
 const cookieParser = require('cookie-parser');
+const JavaScriptObfuscator = require("javascript-obfuscator");
+const multer = require("multer");
 
 const port = process.env.PORT || 3000;
 const app = express();
@@ -18,6 +21,7 @@ const io = socketio(server);
 
 
 const staticPath = path.join(__dirname, "static");
+const uploadsPath = path.join(staticPath, "uploads");
 app.use(express.static(staticPath));
 app.use(cookieParser());
 app.use(express.json());
@@ -25,6 +29,26 @@ app.use(express.urlencoded({ extended: false }));
 const viewsPath = path.join(__dirname, "views");
 app.set("view engine", "pug");
 app.set("views", viewsPath);
+
+
+
+fs.readdir(`${staticPath}\\js`, (err, files) => {
+	if (err) return console.log(err);
+	files.forEach(file => {
+		if (file.includes("Unobfuscated")) {
+			fs.readFile(`${staticPath}\\js\\${file}`, "UTF-8", (err, data) => {
+				if (err) return console.log(err);
+				const obfuscated_data = JavaScriptObfuscator.obfuscate(data);
+				fs.writeFile(`${staticPath}\\js\\${file.replace("Unobfuscated", "")}`, obfuscated_data.getObfuscatedCode(), err => {
+					if (err) return console.log(err);
+				});
+			});
+		}
+	});
+});
+
+
+
 
 const activeUsers = [];
 const socketInfo = {};
@@ -266,15 +290,13 @@ io.on("connection", socket => {
 	socket.on("new user", data => {
 		socketInfo[socket.id] = data.uname;
 		activeUsers.push(data.uname);
-		if (roomNames.indexOf(`${data.uname}-${data.to}`) > -1) {
-			socket.join(`${data.uname}${data.to}`);
-		}
-		else if (roomNames.indexOf(`${data.to}-${data.uname}`) > -1) {
-			socket.join(`${data.to}-${data.uname}`);
+		const roomname = setCollectionName(`${data.uname}-${data.to}`);
+		if (roomNames.indexOf(roomname) > -1) {
+			socket.join(roomname);
 		}
 		else {
-			roomNames.push(`${data.uname}-${data.to}`);
-			socket.join(`${data.uname}-${data.to}`);
+			roomNames.push(roomname);
+			socket.join(roomname);
 		}
 	});
 
@@ -283,22 +305,14 @@ io.on("connection", socket => {
 		handleRoom(socketInfo[socket.id]);
 		activeUsers.splice(activeUsers.indexOf(socketInfo[socket.id]), 1);
 		delete socketInfo[socket.id];
-		// console.log(Object.keys(socketInfo).find(key => socketInfo[key] === socket.id));
 		// io.emit("user disconnected", socketInfo[socket.id]);
 	});
 
 	socket.on("send", async (data) => {
-		let roomname = "";
-		if (roomNames.indexOf(`${data.from}-${data.to}`) > -1) {
-			roomname = `${data.from}-${data.to}`;
-		}
-		else {
-			roomname = `${data.to}-${data.from}`;
-		}
+		let roomname = setCollectionName(`${data.from}-${data.to}`);
 		try {
 			let fromusername = await Users.findOne({ name: data.from });
 			let tousername = await Users.findOne({ name: data.to });
-			console.log(fromusername,tousername);
 			let Msg = chatsConnection.model(setCollectionName(fromusername.username + "-" + tousername.username), msgSchema);
 			let msgdata = { from: data.from, msg: data.msg, date: data.date };
 			let newMsg = new Msg(msgdata);
@@ -323,7 +337,86 @@ app.get("/main", (req, res) => {
 	}
 });
 
+// adding file sharing
+app.post("/sendFile", async (req, res) => {
+	try {
+		const token = req.cookies.jwt;
+		const result = jwt.verify(token, "chintanrajsinh@Harendrasinh@Gohil");
+		const username = req.cookies.username;
+		const clientUserName = req.query.to;
+		const clientUser = await Users.findOne({ name: clientUserName });
+		const filenameAppend = setCollectionName(username + "-" + clientUser.username);
+		var storage = multer.diskStorage({
+			destination: (req, file, callback) => {
+				callback(null, uploadsPath);
+			},
+			filename: (req, file, callback) => {
+				callback(null, filenameAppend + "@457692381@" + file.originalname);
+			}
+		});
 
+		var upload = multer({ storage }).array('file');
+
+		upload(req, res, err => {
+			if (err) {
+				return res.status(400).send({ upoaded: false });
+			}
+			res.status(200).send({ upoaded: true });
+		});
+	}
+	catch (err) {
+		res.redirect("/login");
+	}
+});
+
+
+// downloading file
+app.get("/download", async (req, res) => {
+	try {
+		const token = req.cookies.jwt;
+		const result = jwt.verify(token, "chintanrajsinh@Harendrasinh@Gohil");
+		const filename = req.query.filename;
+		const to = req.query.to;
+		const from = req.query.from;
+		const clientUser = await Users.findOne({ name: to });
+		const user = await Users.findOne({ name: from });
+		const filenameAppend = setCollectionName(user.username + "-" + clientUser.username);
+		fs.readdir(uploadsPath, (err, filesList) => {
+			let flag = false;
+			for (let i = 0; i < filesList.length; i++) {
+				let onefile = filesList[i];
+				const checkFileArr = onefile.split("@457692381@");
+				const downLoadPassword = checkFileArr[0];
+				const checkFileName = checkFileArr[1];
+				if (filename == checkFileName) {
+					if (downLoadPassword == filenameAppend) {
+						flag = true;
+						const downloadPath = path.join(uploadsPath, onefile);
+						res.download(downloadPath, `${filename}`, error => {
+							if (error) res.send(error);
+						});
+						break;
+					}
+					else {
+						res.send("You Are not authorized to download this file !!!");
+					}
+				}
+			}
+			if (!flag) {
+				res.send("This file does not found !!");
+			}
+		});
+	}
+	catch (e) {
+		if (e.message == "jwt must be provided") {
+			res.send("You Are not authorized to download this file !!!");
+		}
+		else {
+			console.log(e);
+			res.send(e);
+		}
+	}
+});
 
 // add contact get handle
 app.get("/addContact", (req, res) => {
@@ -346,12 +439,12 @@ app.post("/addContact", async (req, res) => {
 		const token = req.cookies.jwt;
 		const r = jwt.verify(token, "chintanrajsinh@Harendrasinh@Gohil");
 		if (username === contactName) {
-			throw new Error("You cant add yourself in your contacts");
+			throw new Error("You can't add yourself in your contacts !!");
 		}
 		const userA = await Users.findOne({ username });
 		const userB = await Users.findOne({ username: contactName });
 		if (userB === null) {
-			res.render("addContact.pug", { display: "block", msg: "This user does not exist in our database" });
+			res.render("addContact.pug", { display: "block", msg: "This user does not exist in our database !!" });
 		}
 		else {
 			const Contacts = contactsConnection.model(username.toLowerCase(), contactsSchema);
@@ -362,7 +455,7 @@ app.post("/addContact", async (req, res) => {
 				res.render("loggedinHome.pug");
 			}
 			else {
-				res.render("addContact.pug", { display: "block", msg: "This User already present in your contact list" });
+				res.render("addContact.pug", { display: "block", msg: "This User already present in your contact list !!" });
 			}
 		}
 	}

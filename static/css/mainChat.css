@@ -30,28 +30,35 @@ body {
 }
 
 .sendLogo {
-	position: relative;
-	font-size: 25px;
-	display: block;
-}
-
-.sendLogo::before {
-	content: '';
-	display: flex;
+	display: flex !important;
 	align-items: center;
 	justify-content: center;
 	height: 50px;
 	width: 50px;
+	font-size: 25px;
 	background-color: #25D366;
-	border-radius: 50px;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+.paperclip {
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+	height: 50px;
+	width: 50px;
+	font-size: 25px;
+	color: #fff;
+	background: #065685;
+	border-radius: 50%;
 	cursor: pointer;
 }
 
 #ipMsg {
 	display: block;
-	width: 95%;
 	min-height: 100%;
 	max-height: 100%;
+	width: calc(100% - 100px);
 	font-size: 22px;
 	padding: 8px 17px;
 	border-radius: 50px;
@@ -60,7 +67,8 @@ body {
 
 .sendForm {
 	display: flex;
-	align-items: center;
+	/* align-items: center; */
+	justify-content: center;
 	width: 100%;
 	max-height: 50px;
 	margin-top: auto;
@@ -113,6 +121,15 @@ body {
 	font-size: 18px;
 }
 
+.msg a {
+	color: #2196f3;
+	text-decoration: none;
+}
+
+.msg a:hover {
+	text-decoration: underline;
+}
+
 .time {
 	display: block;
 	color: #c9d7e8bd;
@@ -134,4 +151,167 @@ body {
 
 pre {
 	font-family: consolas;
+}
+
+.modal {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100vh;
+	width: 100vw;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background 0.3s;
+}
+
+.innerModal {
+	position: relative;
+	height: 250px;
+	width: 300px;
+	border-radius: 10px;
+	background: #031323;
+	padding: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	transition: height 0.3s ease, width 0.3s ease;
+}
+
+.err {
+	color: red;
+	margin: 5px 0;
+}
+
+.suc {
+	color: #25D366;
+	margin: 5px 0;
+}
+
+#file {
+	display: none;
+}
+
+#file+label {
+	width: 100%;
+	font-size: 20px;
+	font-weight: 500;
+	background: #fff;
+	color: #000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	padding: 5px 0;
+	border-radius: 5px;
+	transition: background 0.3s, letter-spacing 0.3s;
+	margin: 10px 0;
+}
+
+#file+label:hover {
+	letter-spacing: 1px;
+}
+
+#send {
+	position: relative;
+	cursor: pointer;
+	height: 40px;
+	width: 100%;
+	border: none;
+	border-radius: 5px;
+	color: #000;
+	background: #25D366;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+}
+
+#send::before {
+	position: absolute;
+	transform: translateX(0);
+	font-size: 1.5em;
+	transition: transform 0.3s;
+}
+
+#send:hover::before {
+	transform: translateX(-250px);
+}
+
+#send span {
+	font-size: 18px;
+	font-weight: 600;
+	color: #000;
+	transition: transform 0.3s;
+	transform: translateX(250px);
+}
+
+#send:hover span {
+	transform: translateX(0);
+}
+
+.upload {
+	margin: 0 10px;
+	display: flex;
+	color: #000;
+	align-items: center;
+	justify-content: center;
+}
+
+.cross {
+	position: absolute;
+	top: 10px;
+	right: 15px;
+	padding: 4px 7px;
+	font-size: 25px;
+	cursor: pointer;
+	color: #fff;
+	transition: color 0.3s, background 0.3s, border-radius 0.3s;
+}
+
+.cross:hover {
+	border-radius: 3px;
+	background: #fff;
+	color: #000;
+}
+
+.close {
+	height: 0;
+	width: 0;
+	padding: 0;
+	margin: 0;
+}
+
+.close:nth-child(1)>* {
+	display: none !important;
+}
+
+.animate {
+	display: none;
+}
+
+.loader2 {
+	display: block !important;
+	position: absolute;
+	bottom: 20px;
+	left: 50%;
+	border-radius: 50%;
+	width: 50px;
+	height: 50px;
+	border: 8px solid transparent;
+	border-left: 8px solid #ffffff;
+	border-top: 8px solid #ffffff;
+	border-right: 8px solid #ffffff;
+	animation: rotate3 1s infinite linear;
+	z-index: 10;
+}
+@keyframes rotate3 {
+	0% {
+		transform: translate(-25px) rotate(0deg);
+	}
+	100% {
+		transform: translate(-25px) rotate(360deg);
+	}
 }
