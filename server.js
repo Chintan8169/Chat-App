@@ -32,20 +32,18 @@ app.set("views", viewsPath);
 
 
 
-fs.readdir(`${staticPath}\\js`, (err, files) => {
-	if (err) return console.log(err);
-	files.forEach(file => {
-		if (file.includes("Unobfuscated")) {
-			fs.readFile(`${staticPath}\\js\\${file}`, "UTF-8", (err, data) => {
-				if (err) return console.log(err);
-				const obfuscated_data = JavaScriptObfuscator.obfuscate(data);
-				fs.writeFile(`${staticPath}\\js\\${file.replace("Unobfuscated", "")}`, obfuscated_data.getObfuscatedCode(), err => {
-					if (err) return console.log(err);
-				});
-			});
-		}
-	});
-});
+// fs.readdir(`${staticPath}\\jsunobfuscated`, (err, files) => {
+// 	if (err) return console.log(err);
+// 	files.forEach(file => {
+// 		fs.readFile(`${staticPath}\\jsunobfuscated\\${file}`, "UTF-8", (err, data) => {
+// 			if (err) return console.log(err);
+// 			const obfuscated_data = JavaScriptObfuscator.obfuscate(data);
+// 			fs.writeFile(`${staticPath}\\js\\${file}`, obfuscated_data.getObfuscatedCode(), err => {
+// 				if (err) return console.log(err);
+// 			});
+// 		});
+// 	});
+// });
 
 
 
@@ -82,7 +80,6 @@ const contactsSchema = new mongoose.Schema({
 	},
 	name: String
 });
-// const Contacts = contactsConnection.model("Contacts", contactsSchema);
 
 
 // Home page
@@ -112,10 +109,6 @@ app.get("/login", (req, res) => {
 		res.render("login");
 	}
 });
-
-
-
-
 
 
 // login post handle
@@ -148,16 +141,10 @@ app.post("/login", async (req, res) => {
 });
 
 
-
-
-
 // signup get handle
 app.get("/signup", (req, res) => {
 	res.render("signup.pug", { display: "none", msg: "" });
 });
-
-
-
 
 
 // signup post handle
@@ -188,9 +175,6 @@ app.post("/signup", async (req, res) => {
 });
 
 
-
-
-
 // loggedin home handle
 app.get("/loggedinHome", (req, res) => {
 	try {
@@ -203,7 +187,6 @@ app.get("/loggedinHome", (req, res) => {
 		res.redirect("/login");
 	}
 })
-
 
 
 // fetch contacts event handle
@@ -227,7 +210,6 @@ app.get("/fetchContacts", async (req, res) => {
 });
 
 
-
 // find index of string str in array arr
 const findInd = str => {
 	let indexs = [];
@@ -243,6 +225,7 @@ const findInd = str => {
 		return -1;
 	}
 }
+
 
 // handle roomNames array on disconnect event
 const handleRoom = str => {
@@ -279,11 +262,13 @@ const handleRoom = str => {
 	}
 }
 
+
 const setCollectionName = name => {
 	collectionNameArr = name.trim().split("-");
 	let collectionNameSorted = collectionNameArr[0].localeCompare(collectionNameArr[1]) < 0 ? name : collectionNameArr[1] + "-" + collectionNameArr[0];
 	return collectionNameSorted;
 }
+
 
 // socket.io conncection & main chat screen handle
 io.on("connection", socket => {
@@ -298,14 +283,6 @@ io.on("connection", socket => {
 			roomNames.push(roomname);
 			socket.join(roomname);
 		}
-	});
-
-
-	socket.on("disconnect", () => {
-		handleRoom(socketInfo[socket.id]);
-		activeUsers.splice(activeUsers.indexOf(socketInfo[socket.id]), 1);
-		delete socketInfo[socket.id];
-		// io.emit("user disconnected", socketInfo[socket.id]);
 	});
 
 	socket.on("send", async (data) => {
@@ -323,7 +300,20 @@ io.on("connection", socket => {
 			console.log(err);
 		}
 	});
+
+	socket.on('deleteMessage', data => {
+		let roomname = setCollectionName(`${data.from}-${data.to}`);
+		io.to(roomname).emit("deletedMessage", { indexes: data.indexes, from: data.from });
+	});
+
+	socket.on("disconnect", () => {
+		handleRoom(socketInfo[socket.id]);
+		activeUsers.splice(activeUsers.indexOf(socketInfo[socket.id]), 1);
+		delete socketInfo[socket.id];
+		// io.emit("user disconnected", socketInfo[socket.id]);
+	});
 });
+
 
 // main chat screen get handle
 app.get("/main", (req, res) => {
@@ -336,6 +326,7 @@ app.get("/main", (req, res) => {
 		res.redirect("/login");
 	}
 });
+
 
 // adding file sharing
 app.post("/sendFile", async (req, res) => {
@@ -359,9 +350,9 @@ app.post("/sendFile", async (req, res) => {
 
 		upload(req, res, err => {
 			if (err) {
-				return res.status(400).send({ upoaded: false });
+				return res.status(400).send({ uploaded: false });
 			}
-			res.status(200).send({ upoaded: true });
+			res.status(200).send({ uploaded: true });
 		});
 	}
 	catch (err) {
@@ -418,6 +409,7 @@ app.get("/download", async (req, res) => {
 	}
 });
 
+
 // add contact get handle
 app.get("/addContact", (req, res) => {
 	try {
@@ -470,6 +462,7 @@ app.post("/addContact", async (req, res) => {
 	}
 });
 
+
 // fetch message from database
 app.get("/fetchMsg", async (req, res) => {
 	try {
@@ -489,6 +482,62 @@ app.get("/fetchMsg", async (req, res) => {
 			messages.push(data);
 		});
 		res.status(200).type("json").send(JSON.stringify(messages));
+	}
+	catch (err) {
+		res.redirect("/login");
+		console.log(err);
+	}
+});
+
+
+app.delete("/deleteMessage", async (req, res) => {
+	try {
+		const token = req.cookies.jwt;
+		const r = jwt.verify(token, "chintanrajsinh@Harendrasinh@Gohil");
+		let fromusername = req.cookies.username;
+		let fromname = req.cookies.name;
+		let tousername = await Users.findOne({ name: req.query.to });
+		const collectionName = setCollectionName(fromusername + "-" + tousername.username);
+		let Msg = chatsConnection.model(collectionName, msgSchema);
+		let allDeleted = true;
+		req.body.forEach(async (message) => {
+			if (typeof message.msg == "object") {
+				const filename = collectionName + "@457692381@" + decodeURI(message.msg.filename);
+				fs.readdir(uploadsPath, async (err, filesList) => {
+					let fileExist = false;
+					filesList.forEach(file => {
+						if (file == filename)
+							fileExist = true;
+					});
+					if (fileExist) {
+						fs.unlink(path.join(uploadsPath, filename), err => {
+							if (err) {
+								allDeleted = false;
+							}
+						});
+						const result = await Msg.deleteOne({
+							from: fromname,
+							msg: decodeURI(message.msg.href)
+						});
+						if (!result)
+							allDeleted = false;
+					}
+				});
+			}
+			else {
+				const result = await Msg.deleteOne({
+					from: fromname,
+					msg: message.msg
+				});
+				if (!result)
+					allDeleted = false;
+			}
+		})
+		if (allDeleted)
+			res.status(200).type("json").send(JSON.stringify({ suc: "Successfully Deleted !!!!" }));
+		else
+			res.status(500).type("json").send(JSON.stringify({ error: "Technical Error !!!" }));
+
 	}
 	catch (err) {
 		res.redirect("/login");

@@ -4,19 +4,12 @@ body {
 }
 
 @media (min-width:768px) {
-	body {
-		height: 100vh;
-	}
-
 	.container {
 		margin: 10px 150px;
 	}
 }
 
 @media (min-width:0) and (max-width:768px) {
-	body {
-		height: 93vh;
-	}
 	.container {
 		padding: 5px 15px;
 	}
@@ -29,29 +22,27 @@ body {
 	flex-direction: column;
 }
 
-.sendLogo {
+.fontAwesomeIcon {
 	display: flex !important;
 	align-items: center;
 	justify-content: center;
 	height: 50px;
 	width: 50px;
 	font-size: 25px;
-	background-color: #25D366;
 	border-radius: 50%;
 	cursor: pointer;
 }
 
+.sendLogo {
+	background-color: #25D366;
+}
+
 .paperclip {
-	display: flex !important;
-	align-items: center;
-	justify-content: center;
-	height: 50px;
-	width: 50px;
-	font-size: 25px;
-	color: #fff;
 	background: #065685;
-	border-radius: 50%;
-	cursor: pointer;
+}
+
+.deleteIcon {
+	background: #c5191e;
 }
 
 #ipMsg {
@@ -74,7 +65,7 @@ body {
 	margin-top: auto;
 }
 
-.messageContainer.left::before {
+.messageContainer.left label::before {
 	content: '';
 	position: absolute;
 	top: 0;
@@ -87,7 +78,7 @@ body {
 	border-radius: 10px;
 }
 
-.messageContainer.right::before {
+.messageContainer.right label::before {
 	content: '';
 	position: absolute;
 	top: 0;
@@ -101,10 +92,15 @@ body {
 }
 
 .messageContainer {
-	position: relative;
-	width: 60%;
+	display: flex;
+	align-items: center;
 	margin: 15px 25px;
 	z-index: 0;
+}
+
+.messageContainer label {
+	position: relative;
+	width: 65%;
 }
 
 .from {
@@ -138,15 +134,21 @@ body {
 }
 
 .right {
-	background: #075e54;
-	align-self: flex-end;
-	border-radius: 5px 0 5px 5px;
+	justify-content: space-between;
 }
 
 .left {
-	background: #222529;
-	align-self: flex-start;
+	justify-content: flex-start;
+}
+
+.left label {
 	border-radius: 0 5px 5px 5px;
+	background: #222529;
+}
+
+.right label {
+	border-radius: 5px 0 5px 5px;
+	background: #075e54;
 }
 
 pre {
@@ -171,7 +173,7 @@ pre {
 	height: 250px;
 	width: 300px;
 	border-radius: 10px;
-	background: #031323;
+	background: #768b86;
 	padding: 20px;
 	display: flex;
 	align-items: center;

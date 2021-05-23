@@ -17,7 +17,8 @@ html(lang="en")
 			.ball2
 		.container
 		form.sendForm(autocomplete="off" enctype="multipart/form-data")
-			i.paperclip.fas.fa-paperclip
+			i.paperclip.fontAwesomeIcon.fas.fa-paperclip
+			i.deleteIcon.fontAwesomeIcon.fas.fa-trash
 			.modal.close
 				.innerModal.close
 					.animate
@@ -30,7 +31,7 @@ html(lang="en")
 							span Send
 					.err
 			textarea#ipMsg(name="msg", placeholder="Enter Your Message here" autofocus)
-			i.sendLogo.fas.fa-paper-plane
+			i.sendLogo.fontAwesomeIcon.fas.fa-paper-plane
 	script(src="socket.io/socket.io.js")
 	script(src="js/validator.js")
 	script(src="js/mainChat.js")

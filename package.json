@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js -e js,pug,html"
+    "dev": "nodemon server.js -i static/js"
   },
   "author": "chintanrajsinh",
   "license": "ISC",
