@@ -32,7 +32,7 @@ app.set("views", viewsPath);
 
 
 
-fs.readdir(`${staticPath}\\jsunobfuscated`, (err, files) => {
+/*fs.readdir(`${staticPath}\\jsunobfuscated`, (err, files) => {
 	if (err) return console.log(err);
 	files.forEach(file => {
 		fs.readFile(`${staticPath}\\jsunobfuscated\\${file}`, "UTF-8", (err, data) => {
@@ -43,7 +43,7 @@ fs.readdir(`${staticPath}\\jsunobfuscated`, (err, files) => {
 			});
 		});
 	});
-});
+});*/
 
 
 
