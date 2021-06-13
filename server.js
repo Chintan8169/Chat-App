@@ -32,18 +32,18 @@ app.set("views", viewsPath);
 
 
 
-// fs.readdir(`${staticPath}\\jsunobfuscated`, (err, files) => {
-// 	if (err) return console.log(err);
-// 	files.forEach(file => {
-// 		fs.readFile(`${staticPath}\\jsunobfuscated\\${file}`, "UTF-8", (err, data) => {
-// 			if (err) return console.log(err);
-// 			const obfuscated_data = JavaScriptObfuscator.obfuscate(data);
-// 			fs.writeFile(`${staticPath}\\js\\${file}`, obfuscated_data.getObfuscatedCode(), err => {
-// 				if (err) return console.log(err);
-// 			});
-// 		});
-// 	});
-// });
+fs.readdir(`${staticPath}\\jsunobfuscated`, (err, files) => {
+	if (err) return console.log(err);
+	files.forEach(file => {
+		fs.readFile(`${staticPath}\\jsunobfuscated\\${file}`, "UTF-8", (err, data) => {
+			if (err) return console.log(err);
+			const obfuscated_data = JavaScriptObfuscator.obfuscate(data);
+			fs.writeFile(`${staticPath}\\js\\${file}`, obfuscated_data.getObfuscatedCode(), err => {
+				if (err) return console.log(err);
+			});
+		});
+	});
+});
 
 
 
@@ -78,7 +78,11 @@ const contactsSchema = new mongoose.Schema({
 		type: String,
 		unique: true
 	},
-	name: String
+	name: String,
+	isNewContact: {
+		type: Boolean,
+		default: false
+	}
 });
 
 
@@ -196,12 +200,8 @@ app.get("/fetchContacts", async (req, res) => {
 		const result = jwt.verify(token, "chintanrajsinh@Harendrasinh@Gohil");
 		const username = req.cookies.username;
 		const Contacts = contactsConnection.model(username.toLowerCase(), contactsSchema);
-		const contactsArr = await Contacts.find();
-		const contacts = [];
-		contactsArr.forEach(contact => {
-			contacts.push({ name: contact.name });
-		});
-		res.status(200).send(contacts);
+		const contacts = await Contacts.find({}, { _id: 0, name: 1, username: 1, isNewContact: 1 });
+		res.status(200).send(JSON.stringify(contacts));
 	}
 	catch (err) {
 		console.log(err);
@@ -427,6 +427,7 @@ app.get("/addContact", (req, res) => {
 app.post("/addContact", async (req, res) => {
 	const username = req.cookies.username;
 	const contactName = req.body.username;
+	console.log(req.body);
 	try {
 		const token = req.cookies.jwt;
 		const r = jwt.verify(token, "chintanrajsinh@Harendrasinh@Gohil");
@@ -439,12 +440,20 @@ app.post("/addContact", async (req, res) => {
 			res.render("addContact.pug", { display: "block", msg: "This user does not exist in our database !!" });
 		}
 		else {
-			const Contacts = contactsConnection.model(username.toLowerCase(), contactsSchema);
-			const alreadyExist = await Contacts.findOne({ username: contactName });
+			const Contacts1 = contactsConnection.model(username.toLowerCase(), contactsSchema);
+			const Contacts2 = contactsConnection.model(contactName.toLowerCase(), contactsSchema);
+			const alreadyExist = await Contacts1.findOne({ username: contactName });
 			if (alreadyExist === null) {
-				const newContact = new Contacts({ username: contactName, name: userB.name });
-				const result = await newContact.save();
+				const newContact1 = new Contacts1({ username: contactName, name: userB.name });
+				const result1 = await newContact1.save();
+				const newContact2 = new Contacts2({ username, name: userA.name, isNewContact: true });
+				const result2 = await newContact2.save();
 				res.render("loggedinHome.pug");
+			}
+			else if(alreadyExist && alreadyExist.isNewContact) {
+				alreadyExist.isNewContact=false;
+				await alreadyExist.save();
+				res.send("Success!!");
 			}
 			else {
 				res.render("addContact.pug", { display: "block", msg: "This User already present in your contact list !!" });
@@ -471,17 +480,8 @@ app.get("/fetchMsg", async (req, res) => {
 		let fromusername = req.cookies.username;
 		let tousername = await Users.findOne({ name: req.query.to });
 		let Msg = chatsConnection.model(setCollectionName(fromusername + "-" + tousername.username), msgSchema);
-		let result = await Msg.find();
-		let messages = [];
-		result.forEach(e => {
-			let data = {
-				from: e.from,
-				msg: e.msg,
-				date: e.date
-			}
-			messages.push(data);
-		});
-		res.status(200).type("json").send(JSON.stringify(messages));
+		let result = await Msg.find({}, { _id: 0, from: 1, msg: 1, date: 1 });
+		res.status(200).type("json").send(JSON.stringify(result));
 	}
 	catch (err) {
 		res.redirect("/login");
